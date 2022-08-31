@@ -1,7 +1,18 @@
-diff --git a/./src/internal/syscall.h b/../musl-1.1.19.patched/src/internal/syscall.h
+From: Robert Kuban <robert.kuban@opensynergy.com>
+Date: Mon Aug 15 15:43:34 2022 +0200
+Subject: Add patch to replace open with openat with AT_FDCWD.
+
+This patch replaces calls the open systemcall with the openat systemcall
+with the AT_FDCWD argument on aarch64.
+
+This is necessary as the open system systemcall is not available on aarch64.
+
+Signed-off-by: Robert Kuban <robert.kuban@opensynergy.com>
+
+diff --git a/src/internal/syscall.h b/src/internal/syscall.h
 index 5bdb9ea..f21485f 100644
---- a/./src/internal/syscall.h
-+++ b/../musl-1.1.19.patched/src/internal/syscall.h
+--- a/src/internal/syscall.h
++++ b/src/internal/syscall.h
 @@ -201,7 +201,11 @@ long __syscall_ret(unsigned long), __syscall(uk_syscall_arg_t, ...),
  #define __SC_recvmmsg    19
  #define __SC_sendmmsg    20

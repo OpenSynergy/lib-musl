@@ -1,10 +1,9 @@
-commit a6e720b25da530ec2a2778dc247cbbd7e6f81640
-Author: Felipe Huici <felipe.huici@neclab.eu>
+From a6e720b25da530ec2a2778dc247cbbd7e6f81640
+From: Felipe Huici <felipe.huici@neclab.eu>
 Date:   Thu Sep 6 15:53:07 2018 +0200
-
-    prevent redeclaration compiler error
+Subject: prevent redeclaration compiler error
     
-    Signed-off-by: Felipe Huici <felipe.huici@neclab.eu>
+Signed-off-by: Felipe Huici <felipe.huici@neclab.eu>
 
 diff --git a/include/strings.h b/include/strings.h
 index db0960b4..d4cf149a 100644
