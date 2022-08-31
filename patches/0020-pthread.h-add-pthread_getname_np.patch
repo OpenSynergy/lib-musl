@@ -1,0 +1,27 @@
+From daf5f0bd2ae8355761fb8c4e4dde719042e52454 Mon Sep 17 00:00:00 2001
+From: Ulrich Meis <Ulrich.Meis@opensynergy.com>
+Date: Wed, 31 Aug 2022 13:55:40 +0200
+Subject: [PATCH] pthread.h: add pthread_getname_np().
+
+Adding this to the header so that we can provide an implementation.
+
+Issue: OS-231
+---
+ include/pthread.h | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/include/pthread.h b/include/pthread.h
+index bba9587e..90bd4fad 100644
+--- a/include/pthread.h
++++ b/include/pthread.h
+@@ -215,6 +215,7 @@ int pthread_getaffinity_np(pthread_t, size_t, struct cpu_set_t *);
+ int pthread_setaffinity_np(pthread_t, size_t, const struct cpu_set_t *);
+ int pthread_getattr_np(pthread_t, pthread_attr_t *);
+ int pthread_setname_np(pthread_t, const char *);
++int pthread_getname_np(pthread_t, char *, size_t);
+ int pthread_getattr_default_np(pthread_attr_t *);
+ int pthread_setattr_default_np(const pthread_attr_t *);
+ int pthread_tryjoin_np(pthread_t, void **);
+-- 
+2.37.1
+
