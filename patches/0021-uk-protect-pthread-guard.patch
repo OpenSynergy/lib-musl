@@ -1,0 +1,39 @@
+From 538a87648a571d4b71c627e56ecda0a6031a1753 Mon Sep 17 00:00:00 2001
+From: Ulrich Meis <Ulrich.Meis@opensynergy.com>
+Date: Fri, 9 Sep 2022 15:08:01 +0200
+Subject: [PATCH] uk: protect pthread guard.
+
+Since mprotect() is currently a no-op we use a special function
+
+	void uk_mprotect_pthread_guard(addr, size, protect);
+
+to protect the guard page.
+
+Issue: OS-231
+---
+ src/thread/pthread_create.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/src/thread/pthread_create.c b/src/thread/pthread_create.c
+index d7d5da9a..d654bfd7 100644
+--- a/src/thread/pthread_create.c
++++ b/src/thread/pthread_create.c
+@@ -121,6 +121,7 @@ _Noreturn void __pthread_exit(void *result)
+ 		 * a different approach and let the `idle` thread do the
+ 		 * cleaning. Please refer to the `__uk_unampself.c` file.
+ 		 */
++		uk_mprotect_pthread_guard(self->map_base, self->guard_size, 0);
+ 		__uk_unmapself(self->map_base, self->map_size);
+ 	}
+ 
+@@ -263,6 +264,7 @@ int __pthread_create(pthread_t *restrict res, const pthread_attr_t *restrict att
+ 				__munmap(map, size);
+ 				goto fail;
+ 			}
++		uk_mprotect_pthread_guard(map, guard, 1);
+ 		} else {
+ 			map = __mmap(0, size, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANON, -1, 0);
+ 			if (map == MAP_FAILED) goto fail;
+-- 
+2.37.1
+

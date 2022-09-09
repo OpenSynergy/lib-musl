@@ -33,6 +33,8 @@
 #include <sys/types.h>
 #include <uk/alloc.h>
 #include <sys/mman.h>
+#include <uk/plat/paging.h>
+#include <uk/plat/io.h>
 
 /* Forward to libucallocator calls */
 void *malloc(size_t size)
@@ -69,4 +71,31 @@ void free(void *ptr)
 int mprotect(void *addr __unused, size_t len __unused, int prot __unused)
 {
 	return 0;
+}
+
+void uk_mprotect_pthread_guard(void *addr, size_t len, int protect)
+{
+	int rc = 0;
+	uintptr_t paddr;
+
+	if (len != PAGE_SIZE)
+		UK_CRASH("%s: unexpected size of the guard: 0x%lx", __func__, len);
+
+	if ((uintptr_t)addr&(PAGE_SIZE-1))
+		UK_CRASH("%s: guard is not page aligned: %p", __func__, addr);
+
+	if (protect) {
+		uk_pr_info("%s: unmap %p\n", __func__, addr);
+		rc = ukplat_page_unmap(ukplat_pt_get_active(), (uintptr_t)addr, 1, PAGE_FLAG_KEEP_FRAMES);
+		if (rc)
+			UK_CRASH("%s: failed to unmap guard page at %p", __func__, addr);
+	} else {
+		uk_pr_info("%s: map %p\n", __func__, addr);
+		/* TODO: boldly assume this is not the first page of the heap */
+		paddr = ukplat_virt_to_phys(addr - 0x1000) + 0x1000;
+		rc = ukplat_page_map(ukplat_pt_get_active(), (uintptr_t)addr,
+				     paddr, 1, PAGE_ATTR_PROT_RW, 0);
+		if (rc)
+			UK_CRASH("%s: failed to (re)map guard page at %p", __func__, addr);
+	}
 }
